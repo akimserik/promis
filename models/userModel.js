@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Please enter a name'],
+    unique: true,
     trim: true,
     maxlength: [50, 'User must be max 50 characters!'],
   },
@@ -48,13 +49,13 @@ const userSchema = new mongoose.Schema({
   },
   passwordChangedAt: {
     type: Date,
+    select: false,
   },
   passwordResetToken: String,
   passwordResetExpires: Date,
   active: {
     type: Boolean,
     default: true,
-    select: false,
   },
 
   firstName: {
@@ -68,7 +69,7 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Last name empty'],
     trim: true,
-    maxlength: [50, 'Last name must be max 50 characters!'],
+    maxlength: [30, 'Last name must be max 50 characters!'],
   },
 
   department: {

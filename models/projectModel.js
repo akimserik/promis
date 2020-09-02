@@ -1,5 +1,24 @@
 const mongoose = require('mongoose');
 
+const projectStages = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+    maxlength: [30, 'Stage name must be max 30 characters!'],
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxlength: [200, 'Description name must be max 200 characters!'],
+  },
+  budgetedHours: {
+    type: Number,
+    default: 0,
+    min: [0, 'Bugeted hours must be a positive whole number above 0'],
+  },
+});
+
 const projectSchema = new mongoose.Schema(
   {
     engagementCode: {
@@ -109,6 +128,14 @@ const projectSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    team: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
+    stages: [projectStages],
   },
   {
     toJSON: { virtuals: true },
@@ -131,6 +158,16 @@ projectSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'inCharge',
     select: 'name',
+  });
+
+  this.populate({
+    path: 'team',
+    select: 'name position',
+  });
+
+  this.populate({
+    path: 'stages',
+    select: '-budgetedHours',
   });
 
   next();

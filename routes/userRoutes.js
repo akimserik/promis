@@ -22,14 +22,14 @@ router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
 
 router.route('/').get(userController.getAllUsers);
+router.route('/:id').get(userController.getUser);
 
-// below routes are available only to Admin
-router.use(authController.restrictTo('admin'));
+// below routes are available only to specific roles
+router.use(authController.restrictTo('admin', 'HR'));
 
 router.route('/').post(userController.createUser);
 router
   .route('/:id')
-  .get(userController.getUser)
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
 

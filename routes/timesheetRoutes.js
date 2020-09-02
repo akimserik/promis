@@ -13,25 +13,24 @@ router.get(
   timesheetController.getAllTimesheets
 );
 
+router.get(
+  '/my-stats',
+  timesheetController.filterByMe,
+  timesheetController.getTimesheetDailyStats
+);
+
 router
   .route('/')
   .get(
     authController.restrictTo('admin', 'support', 'HR', 'partner'),
     timesheetController.getAllTimesheets
   )
-  .post(
-    authController.restrictTo('staff', 'manager', 'partner'),
-    timesheetController.setUserID,
-    timesheetController.createTimesheet
-  );
+  .post(timesheetController.setUserID, timesheetController.createTimesheet);
 
 router
   .route('/:id')
   .get(timesheetController.getTimesheet)
   .patch(timesheetController.updateTimesheet)
-  .delete(
-    authController.restrictTo('admin', 'support'),
-    timesheetController.deleteTimesheet
-  );
+  .delete(timesheetController.deleteTimesheet);
 
 module.exports = router;

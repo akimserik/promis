@@ -49,6 +49,10 @@ const timesheetSchema = new mongoose.Schema(
       max: [16, 'Charged hours can be maximum 16 per day'],
     },
 
+    projectStage: {
+      type: mongoose.Types.ObjectId,
+    },
+
     comment: {
       type: String,
       max: [100, 'Please enter max 100 symbols for comment'],
@@ -59,6 +63,12 @@ const timesheetSchema = new mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+timesheetSchema.virtual('projectDetails', {
+  ref: 'Project',
+  foreignField: '_id',
+  localField: 'project',
+});
 
 // QUERY MIDDLEWARE
 timesheetSchema.pre(/^find/, function (next) {
@@ -73,7 +83,16 @@ timesheetSchema.pre(/^find/, function (next) {
 timesheetSchema.pre(/^find/, function (next) {
   this.populate({
     path: 'project',
-    select: 'engagementCode clientName expectedDateOfReport completion',
+    select: 'engagementCode clientName completion',
+  });
+
+  next();
+});
+
+timesheetSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'projectStage',
+    select: 'name',
   });
 
   next();
