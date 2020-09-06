@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const cors = require('cors');
+const compression = require('compression');
 // const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
@@ -53,8 +54,8 @@ app.use(xss());
 //   })
 // );
 
-// Serving static files
-app.use(express.static(`${__dirname}/public`));
+// Compress all text sent to Client
+app.use(compression());
 
 // Test Middleware
 app.use((req, res, next) => {
@@ -71,6 +72,15 @@ app.use('/api/v1/timesheets', timesheetRouter);
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+
+// Handle production
+if (process.env.NODE_ENV === 'production') {
+  // Serving static files
+  app.use(express.static(`${__dirname}/public`));
+
+  // Handle SPA
+  app.get(/.*/, (req, res) => res.sendFile(`${__dirname}/public/index.html`));
+}
 
 app.use(globalErrorHandler);
 
