@@ -7,6 +7,7 @@
   "description": "Backend for PROMIS APP",
   "main": "app.js",
   "scripts": {
+    "start": "node server.js",
     "dev": "nodemon server.js",
     "prod": "NODE_ENV=production nodemon server.js",
     "debug": "ndb server.js"
