@@ -6,6 +6,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const cors = require('cors');
 const compression = require('compression');
+const path = require('path');
 // const hpp = require('hpp');
 
 const AppError = require('./utils/appError');
@@ -63,6 +64,17 @@ app.use((req, res, next) => {
   next();
 });
 
+// Handle production
+if (process.env.NODE_ENV === 'production') {
+  // Serving static files
+  app.use(express.static(path.join(__dirname, 'public')));
+
+  // Handle SPA
+  app.get(/.*/, (req, res) =>
+    res.sendFile(path.join(__dirname, 'public/index.html'))
+  );
+}
+
 // ROUTES
 app.use('/api/v1/projects', projectRouter);
 app.use('/api/v1/users', userRouter);
@@ -72,15 +84,6 @@ app.use('/api/v1/timesheets', timesheetRouter);
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
-
-// Handle production
-if (process.env.NODE_ENV === 'production') {
-  // Serving static files
-  app.use(express.static(`${__dirname}/public`));
-
-  // Handle SPA
-  app.get('/', (req, res) => res.end(`${__dirname}/public/index.html`));
-}
 
 app.use(globalErrorHandler);
 
